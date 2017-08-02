@@ -1,0 +1,109 @@
+- hosts: condor
+
+  tasks:
+  - name: install condor for all ubuntu nodes
+    apt: name=condor state=present
+    when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+  - block:
+    - name: disable selinux
+      selinux: state=disabled
+    - name: install htcondor repositories
+      get_url: url=https://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo dest=/etc/yum.repos.d
+    - name: import condor key
+      rpm_key: state=present key=http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
+    - name: install condor for all centos nodes
+      yum: name=condor.x86_64 state=present
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+- hosts: condor-manager
+  vars_files:
+  - /home/ubuntu/playbooks/cyvars.yaml
+
+  tasks:
+  - name: change condor config for manager
+    lineinfile:
+      backup: yes
+      path: /etc/condor/condor_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
+      - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
+      - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, SCHEDD, NEGOTIATOR, COLLECTOR, SHARED_PORT' } #####sort out this
+      - { regexp: '^USE_SHARED_PORT =', line: 'USE_SHARED_PORT = True' }
+      - { regexp: '^SHARED_PORT_ARGS =', line: 'SHARED_PORT_ARGS = -p 4080' }
+      - { regexp: '^LOWPORT =', line: 'LOWPORT = 4080' }
+      - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 5080' }
+    notify:
+      - restart condor
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/condor.yaml
+
+
+- hosts: condor-workers
+  vars_files:
+  - /home/ubuntu/playbooks/cyvars.yaml
+
+  tasks:
+  - name: change condor config for workers
+    lineinfile:
+      backup: yes
+      path: /etc/condor/condor_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: '^ALLOW_READ ', line: 'ALLOW_READ            = *' }
+      - { regexp: '^ALLOW_WRITE ', line: 'ALLOW_WRITE           = *' }
+      - { regexp: '^ALLOW_ADMINISTRATOR ', line: 'ALLOW_ADMINISTRATOR   = *' }
+      - { regexp: '^ALLOW_CONFIG ', line: 'ALLOW_CONFIG          = *' }
+      - { regexp: '^ALLOW_NEGOTIATOR ', line: 'ALLOW_NEGOTIATOR      = *' }
+      - { regexp: '^ALLOW_DAEMON ', line: 'ALLOW_DAEMON          = *' }
+      - { regexp: '^HOSTALLOW_READ =', line: 'HOSTALLOW_READ =' }
+      - { regexp: '^HOSTALLOW_WRITE =', line: 'HOSTALLOW_WRITE =' }
+      - { regexp: '^HOSTALLOW_DAEMON =', line: 'HOSTALLOW_DAEMON =' }
+      - { regexp: '^HOSTALLOW_NEGOTIATOR =', line: 'HOSTALLOW_NEGOTIATOR =' }
+      - { regexp: '^HOSTALLOW_ADMINISTRATOR =', line: 'HOSTALLOW_ADMINISTRATOR =' }
+      - { regexp: '^HOSTALLOW_OWNER =', line: 'HOSTALLOW_OWNER ='}
+      - { regexp: '^BIND_ALL_INTERFACES =', line: 'BIND_ALL_INTERFACES = False' }
+      - { regexp: '^NETWORK_INTERFACE =', line: 'NETWORK_INTERFACE = eth0' }
+      - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
+      - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
+      #- { regexp: '^SCHEDD_HOST =', line: 'SCHEDD_HOST = submit' }
+      - { regexp: '^SLOT_TYPE_1 =', line: 'SLOT_TYPE_1 = cpus=100%,disk=100%,swap=100%' }
+      - { regexp: '^SLOT_TYPE_1_PARTITIONABLE =', line: 'SLOT_TYPE_1_PARTITIONABLE = True' }
+      - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, STARTD' }
+      - { regexp: '^LOWPORT =', line: 'LOWPORT = 5000' }
+      - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 6000' }
+      - { regexp: '^DOCKER =', line: 'DOCKER = /usr/bin/docker' }
+    notify:
+      - restart condor
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/condor.yaml
+
+
+- hosts: condor-submit
+  vars_files:
+  - /home/ubuntu/playbooks/cyvars.yaml
+
+  tasks:
+  - name: change condor config for submit centos nodes
+    lineinfile:
+      backup: yes
+      path: /etc/condor/condor_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
+      - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
+      - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, SCHEDD, SHARED_PORT' } #####sort out this
+      - { regexp: '^USE_SHARED_PORT =', line: 'USE_SHARED_PORT = True' }
+      - { regexp: '^SHARED_PORT_ARGS =', line: 'SHARED_PORT_ARGS = -p 4080' }
+      - { regexp: '^LOWPORT =', line: 'LOWPORT = 4081' }
+      - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 5080' }
+      - { regexp: '^ENABLE_IPV6 =', line: 'ENABLE_IPV6 = false' }
+    notify:
+      - restart condor
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/condor.yaml
+

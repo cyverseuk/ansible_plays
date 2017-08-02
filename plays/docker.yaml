@@ -1,0 +1,46 @@
+- hosts: condor-workers
+  become: yes
+  become_method: sudo
+
+  tasks:
+  - block:
+    - name: remove old docker installation
+      apt: name={{ item }} state=absent
+      with_items:
+      - docker
+      - docker-engine
+      - docker.io
+    - block:
+      - name: install additional packages for docker on trusty
+        apt: name={{ item }} state=present
+        with_items:
+        - 'linux-image-extra-$(uname -r)'
+        - linux-image-extra-virtual
+      when: ansible_distribution_version == '14.04'
+    - name: install pkgs to allow apt to use https
+      apt: name={{ item }} state=present
+      with_items:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    - name: add docker GPG key
+      apt_key:
+        state: present
+        url: https://download.docker.com/linux/ubuntu/gpg
+        id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88 #not sure this works
+    - name: save distribution
+      command: "lsb_release -cs"
+      register: command_output
+      check_mode: no
+    - debug:
+        var: command_output.stdout
+    - name: add docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu{{ command_output.stdout }}stable
+        state: present
+    - name: install docker on workers
+      apt: name=docker-ce=17.06.0 state=present update_cache=yes
+      when: not ansible_check_mode #this is needed as in check mode the repo is not there
+    when: ansible_distribution == 'Ubuntu' and ansible_distribution_version >= '14.04'
+

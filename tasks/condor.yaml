@@ -1,0 +1,25 @@
+- name: add condor conf block
+  blockinfile:
+    backup: yes
+    path: /etc/condor/condor_config
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      ALLOW_READ            = *
+      ALLOW_WRITE           = *
+      ALLOW_ADMINISTRATOR   = *
+      ALLOW_CONFIG          = *
+      ALLOW_NEGOTIATOR      = *
+      ALLOW_DAEMON          = *
+      
+      # Clear out any old-style HOSTALLOW settings:
+      HOSTALLOW_READ =
+      HOSTALLOW_WRITE =
+      HOSTALLOW_DAEMON =
+      HOSTALLOW_NEGOTIATOR =
+      HOSTALLOW_ADMINISTRATOR =
+      HOSTALLOW_OWNER =
+      
+      BIND_ALL_INTERFACES = False
+      NETWORK_INTERFACE = eth0
+
+  
