@@ -1,9 +1,21 @@
 - hosts: condor
+  become: yes
+  become_method: sudo
 
   tasks:
-  - name: install condor for all ubuntu nodes
-    apt: name=condor state=present
-    when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+  - block:
+    - name: add apt repository for condor
+      apt_repository:
+        repo: deb http://research.cs.wisc.edu/htcondor/ubuntu/stable/ trusty contrib
+        state: present
+    - name: install condor key
+      apt_key:
+        state: present
+        url: http://research.cs.wisc.edu/htcondor/ubuntu/HTCondor-Release.gpg.key
+    - name: install condor for all ubuntu nodes
+      apt: name=condor state=present
+      when: not ansible_check_mode
+    when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
   - block:
     - name: disable selinux
       selinux: state=disabled
@@ -25,6 +37,7 @@
     lineinfile:
       backup: yes
       path: /etc/condor/condor_config
+      create: yes
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
     with_items:
@@ -76,6 +89,7 @@
       - { regexp: '^LOWPORT =', line: 'LOWPORT = 5000' }
       - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 6000' }
       - { regexp: '^DOCKER =', line: 'DOCKER = /usr/bin/docker' }
+      - { regexp: '^ENABLE_IPV6 =', line: 'ENABLE_IPV6 = false' }
     notify:
       - restart condor
   handlers:
