@@ -58,7 +58,7 @@
       with_items:
       - docker
       - docker-common
-      - docker-selinux
+      #- docker-selinux this seems to exists in the new versions and keep deleting all docker! not ok
       - docker-engine
     - name: installing required packages
       yum: name={{ item }} state=present
@@ -76,4 +76,8 @@
     - name: install docker 
       yum: name=docker-ce-17.06.0.ce-1.el7.centos state=present update_cache=yes
       when: not ansible_check_mode #this is needed as in check mode the repo is not there
+      notify: 
+      - restart docker
     when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/services.yaml
