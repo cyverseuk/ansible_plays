@@ -3,6 +3,8 @@
   become_method: sudo
 
   tasks:
+  - debug:
+      var: ansible_distribution_major_version
   - block:
     - name: remove old docker installation
       apt: name={{ item }} state=absent
@@ -46,7 +48,32 @@
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ command_output.stdout }} stable
         state: present
     - name: install docker on workers
-      apt: name=docker-ce=17.06.0~ce-0~ubuntu state=present update_cache=yes
+      apt: name=docker-ce-17.06.0~ce-0~ubuntu state=present update_cache=yes
       when: not ansible_check_mode #this is needed as in check mode the repo is not there
     when: ansible_distribution == 'Ubuntu' and ansible_distribution_version >= '14.04'
-
+    
+  - block:
+    - name: uninstall old docker versions
+      yum: name={{ item }} state=absent
+      with_items:
+      - docker
+      - docker-common
+      - docker-selinux
+      - docker-engine
+    - name: installing required packages
+      yum: name={{ item }} state=present
+      with_items:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    - name: setup stable repository
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: '/etc/yum.repos.d/docker-ce.repo'
+        owner: root
+        group: root
+        mode: 0644
+    - name: install docker 
+      yum: name=docker-ce-17.06.0.ce-1.el7.centos state=present update_cache=yes
+      when: not ansible_check_mode #this is needed as in check mode the repo is not there
+    when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
