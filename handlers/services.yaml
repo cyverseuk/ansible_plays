@@ -1,0 +1,9 @@
+- name: restart condor
+  service: name=condor state=restarted
+  become: yes
+  become_method: sudo
+
+- name: restart docker
+  service: name=docker state=restarted
+  become: yes
+  become_method: sudo

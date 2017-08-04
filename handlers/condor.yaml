@@ -1,4 +1,0 @@
-- name: restart condor
-  service: name=condor state=restarted
-  become: yes
-  become_method: sudo
