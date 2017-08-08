@@ -7,3 +7,6 @@
   service: name=docker state=restarted
   become: yes
   become_method: sudo
+
+- name: reboot
+  command: /sbin/reboot
