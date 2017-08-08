@@ -1,0 +1,24 @@
+---
+
+- hosts: condor
+  become: yes
+  become_method: sudo
+  vars_files:
+  - /home/ubuntu/playbooks/cyvars.yaml
+
+  tasks:
+  - name: install condor for all ubuntu nodes
+    apt: name=condor state=latest update_cache=yes
+    notify:
+      - restart condor
+    when: not ansible_check_mode and ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
+  - name: update condor on centos
+    yum: name={{ condor_version }} state=present update_cache=yes
+    notify: 
+      - restart condor
+    when: not ansible_check_mode and ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  - name: ensure condor is running
+    service: name=condor state=started
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/services.yaml
+
