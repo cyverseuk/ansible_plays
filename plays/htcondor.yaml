@@ -17,8 +17,10 @@
       when: not ansible_check_mode
     when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
   - block:
-    - name: disable selinux
-      selinux: state=disabled
+    #- name: disable selinux this is not needed anymore?
+    #  selinux: state=disabled
+    #  notify: 
+    #    - reboot
     - name: install htcondor repositories
       get_url: url=https://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo dest=/etc/yum.repos.d
     - name: import condor key
@@ -27,7 +29,10 @@
       yum: name=condor.x86_64 state=present
       when: not ansible_check_mode
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
-
+  - name: ensure condor is running
+    service: name=condor state=started
+  handlers:
+    - include: /home/ubuntu/playbooks/handlers/services.yaml
 
 - hosts: condor-manager
   become: yes
