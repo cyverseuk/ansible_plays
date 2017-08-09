@@ -1,0 +1,17 @@
+- name: change condor config for manager
+  lineinfile:
+    backup: yes
+    path: /etc/condor/condor_config
+    create: yes
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    with_items:
+    - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
+    - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
+    - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, SCHEDD, NEGOTIATOR, COLLECTOR, SHARED_PORT' } #####sort out this
+    - { regexp: '^USE_SHARED_PORT =', line: 'USE_SHARED_PORT = True' }
+    - { regexp: '^SHARED_PORT_ARGS =', line: 'SHARED_PORT_ARGS = -p 4080' }
+    - { regexp: '^LOWPORT =', line: 'LOWPORT = 4080' }
+    - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 5080' }
+  notify:
+    - restart condor

@@ -1,0 +1,11 @@
+- name: add apt repository for condor
+  apt_repository:
+    repo: deb http://research.cs.wisc.edu/htcondor/ubuntu/stable/ trusty contrib
+    state: present
+- name: install condor key
+  apt_key:
+    state: present
+    url: http://research.cs.wisc.edu/htcondor/ubuntu/HTCondor-Release.gpg.key
+- name: install condor for all ubuntu nodes
+  apt: name=condor state=present
+  when: not ansible_check_mode

@@ -1,0 +1,30 @@
+---
+- hosts: condor-workers
+  become: yes
+  become_method: sudo
+  vars_files: 
+  - cyvars.yaml
+
+  roles:
+    - htcondor
+    - condor_worker
+
+- hosts: condor-manager
+  become: yes
+  become_method: sudo
+  vars_files: 
+  - cyvars.yaml
+ 
+  roles:
+    - htcondor
+    - condor_manager
+
+- hosts: condor-submit
+  become: yes
+  become_method: sudo
+  vars_files: 
+  - cyvars.yaml
+
+  roles:
+    - htcondor
+    - condor_submit

@@ -1,0 +1,11 @@
+#- name: disable selinux this is not needed anymore?
+  #  selinux: state=disabled
+  #  notify: 
+  #    - reboot
+- name: install htcondor repositories
+  get_url: url=https://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo dest=/etc/yum.repos.d
+- name: import condor key
+  rpm_key: state=present key=http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
+- name: install condor for centos nodes
+  yum: name=condor.x86_64 state=present
+  when: not ansible_check_mode

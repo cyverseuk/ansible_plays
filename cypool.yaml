@@ -1,6 +1,5 @@
 ---
-- include: /home/ubuntu/playbooks/plays/docker.yaml
+- include: docker.yaml
 
-
-- include: /home/ubuntu/playbooks/plays/htcondor.yaml
+- include: htcondor.yaml
 
