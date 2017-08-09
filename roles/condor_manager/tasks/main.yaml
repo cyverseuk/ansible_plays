@@ -5,7 +5,7 @@
     create: yes
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    with_items:
+  with_items:
     - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
     - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
     - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, SCHEDD, NEGOTIATOR, COLLECTOR, SHARED_PORT' } #####sort out this
