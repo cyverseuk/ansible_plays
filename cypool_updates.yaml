@@ -7,7 +7,7 @@
   - /home/ubuntu/playbooks/cyvars.yaml
 
   tasks:
-  - name: install condor for all ubuntu nodes
+  - name: update condor for ubuntu nodes
     apt: name=condor state=latest update_cache=yes
     notify:
       - restart condor
@@ -20,5 +20,5 @@
   - name: ensure condor is running
     service: name=condor state=started
   handlers:
-    - include: /home/ubuntu/playbooks/handlers/services.yaml
+    - include: /home/ubuntu/playbooks/roles/htcondor/handlers/main.yaml
 
