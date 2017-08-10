@@ -1,0 +1,8 @@
+- name: delete temporary uploads as cronjob
+  cron:
+    hour: 9
+    job: /mnt/data/cleantemp.sh
+    minute: 0
+    state: present
+    user: ubuntu
+    name: temp_web_files

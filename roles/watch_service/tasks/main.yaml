@@ -1,0 +1,19 @@
+- name: add watch service
+  become: yes
+  become_method: sudo
+  copy: 
+    backup: yes
+    content: |
+      [Unit]
+      Description=Watching user folders and archives and create archived tar
+      
+      [Service]
+      ExecStart=/mnt/data/watch.sh
+      
+      [Install]
+      WantedBy=default.target
+    dest: /etc/systemd/system/watch.service
+    mode: u=rw,g=r,o=r
+    owner: root
+  notify:
+    - start watch service

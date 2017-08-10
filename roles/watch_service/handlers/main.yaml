@@ -1,0 +1,4 @@
+- name: start watch service
+  service: name=watch state=started
+  become: yes
+  become_method: sudo

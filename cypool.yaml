@@ -3,3 +3,8 @@
 
 - include: htcondor.yaml
 
+- hosts: condor-master
+  
+  roles:
+    - crontab
+    - watch_service
