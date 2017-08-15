@@ -3,5 +3,5 @@
 - include: centos.yaml
   when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
 - name: ensure condor is running
-  service: name=condor state=started
+  service: name=condor state=started enabled=yes
 
