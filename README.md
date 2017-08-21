@@ -7,3 +7,8 @@ When adding a virtual machine to the HTCondor pool and/or to the Cyverse infrast
 `cypool.yaml` will setup workers (assume they all have centOS7 as OS) to run condor and have the docker universe available. The submit machines are supposed to have centOS as well. It also setup crontab and watch service on the condor manager (internal docs).
 
 `cypool_updates.yaml` can upgrade the condor version. It will now work if not using the official repository. Use the limit flag and choose which nodes to apply it to as it would kill any running jobs by default. It needs to have the version of HTCondor specified in the var file.
+
+NOTES for future updates:
+
+* don't write playbooks assuming condor workers host names. They may change. See internal EI documentation about this. If needed a solution is there as well.
+* manager is not up to date as it has to be re-registered. Consider this before running the playbook on the whole pool.
