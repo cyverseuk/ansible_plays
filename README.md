@@ -14,20 +14,21 @@ NOTES for future updates:
   _expection now in docker.yaml as that is a single test machine ATM_
 * manager is not up to date as it has to be re-registered. Consider this before running the playbook on the whole pool.
 * for // universe add the following to the workers that should run parallel applications:
-  ```
-DedicatedScheduler = "DedicatedScheduler@<exact host name as in condor_status --schedd>"
-STARTD_ATTRS = $(STARTD_ATTRS), DedicatedScheduler
-START          = True
-SUSPEND        = False
-CONTINUE       = True
-PREEMPT        = False
-KILL           = False
-WANT_SUSPEND   = False
-WANT_VACATE    = False
-RANK           = Scheduler =?= $(DedicatedScheduler)
 
-MPI_CONDOR_RSH_PATH = $(LIBEXEC)
-CONDOR_SSHD = /usr/sbin/sshd
-CONDOR_SSH_KEYGEN = /usr/bin/ssh-keygen
-```
+  ```DedicatedScheduler = "DedicatedScheduler@<exact host name as in condor_status --schedd>"
+  STARTD_ATTRS = $(STARTD_ATTRS), DedicatedScheduler
+  START          = True
+  SUSPEND        = False
+  CONTINUE       = True
+  PREEMPT        = False
+  KILL           = False
+  WANT_SUSPEND   = False
+  WANT_VACATE    = False
+  RANK           = Scheduler =?= $(DedicatedScheduler)
+  
+  MPI_CONDOR_RSH_PATH = $(LIBEXEC)
+  CONDOR_SSHD = /usr/sbin/sshd
+  CONDOR_SSH_KEYGEN = /usr/bin/ssh-keygen
+  ```  
+  
   note this relies on the submit machine name. It's not in the playbook as it's now not needed.
