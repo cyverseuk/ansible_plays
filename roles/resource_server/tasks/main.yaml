@@ -1,0 +1,4 @@
+- include: ubuntu.yaml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
+- include: centos.yaml
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

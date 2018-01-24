@@ -1,0 +1,7 @@
+- hosts: cyverse-irods
+  become: yes
+  become_method: sudo
+  roles:
+    - docker
+    - docker_compose
+    - resource_server

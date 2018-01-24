@@ -1,0 +1,5 @@
+- name: get tony's repository for cyverse
+  get_url: 
+    url: https://github.com/cyverse/docker-cyverse-irods-rs/archive/0cea22faa165563e6d81b3f9d69bcec015656ec1.zip
+    dest: /home/centos/uk-resource
+

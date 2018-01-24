@@ -3,6 +3,8 @@
 
 - include: htcondor.yaml
 
+- include: irods.yaml
+
 - hosts: condor-master
   
   roles:
