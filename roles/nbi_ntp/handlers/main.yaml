@@ -1,0 +1,9 @@
+- name: restart ntp
+  service: name=ntp state=restarted
+  become: yes
+  become_method: sudo
+
+- name: restart ntpd
+  service: name=ntpd state=restarted
+  become: yes
+  become_method: sudo
