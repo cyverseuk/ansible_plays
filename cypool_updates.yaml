@@ -4,7 +4,7 @@
   become: yes
   become_method: sudo
   vars_files:
-  - /home/ubuntu/playbooks/cyvars.yaml
+  - {{ path_to_plays }}/cyvars.yaml
 
   tasks:
   - name: update condor for ubuntu nodes
@@ -20,5 +20,5 @@
   - name: ensure condor is running
     service: name=condor state=started
   handlers:
-    - include: /home/ubuntu/playbooks/roles/htcondor/handlers/main.yaml
+    - include: {{ path_to_plays }}/roles/htcondor/handlers/main.yaml
 

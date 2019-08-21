@@ -18,8 +18,8 @@
     - { regexp: '^HOSTALLOW_NEGOTIATOR =', line: 'HOSTALLOW_NEGOTIATOR =' }
     - { regexp: '^HOSTALLOW_ADMINISTRATOR =', line: 'HOSTALLOW_ADMINISTRATOR =' }
     - { regexp: '^HOSTALLOW_OWNER =', line: 'HOSTALLOW_OWNER ='}
-    - { regexp: '^BIND_ALL_INTERFACES =', line: 'BIND_ALL_INTERFACES = False' }
-    - { regexp: '^NETWORK_INTERFACE =', line: 'NETWORK_INTERFACE = eth0' }
+    - { regexp: '^BIND_ALL_INTERFACES =', line: 'BIND_ALL_INTERFACES = True' }
+    - { regexp: '^NETWORK_INTERFACE =', line: '#NETWORK_INTERFACE = eth0' }
     - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
     - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
     #- { regexp: '^SCHEDD_HOST =', line: 'SCHEDD_HOST = submit' }

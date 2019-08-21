@@ -1,4 +1,4 @@
-- name: change condor config for manager
+- name: change condor config for Manager
   lineinfile:
     backup: yes
     path: /etc/condor/condor_config
@@ -7,11 +7,22 @@
     line: "{{ item.line }}"
   with_items:
     - { regexp: '^CONDOR_HOST =', line: "CONDOR_HOST = {{ manager_ip }}" }
+    - { regexp: '^COLLECTOR_PORT =', line: "COLLECTOR_PORT = 4080" }
     - { regexp: '^COLLECTOR_HOST =', line: 'COLLECTOR_HOST = $(CONDOR_HOST):4080?sock=collector' }
     - { regexp: '^DAEMON_LIST =', line: 'DAEMON_LIST = MASTER, SCHEDD, NEGOTIATOR, COLLECTOR, SHARED_PORT' } #####sort out this
     - { regexp: '^USE_SHARED_PORT =', line: 'USE_SHARED_PORT = True' }
     - { regexp: '^SHARED_PORT_ARGS =', line: 'SHARED_PORT_ARGS = -p 4080' }
     - { regexp: '^LOWPORT =', line: 'LOWPORT = 4080' }
     - { regexp: '^HIGHPORT =', line: 'HIGHPORT = 5080' }
+    - { regexp: '^PRIVATE_NETWORK_INTERFACE =', line: "PRIVATE_NETWORK_INTERFACE = {{ manager_ip }}" }
+    - { regexp: '^ALLOW_READ', line: 'ALLOW_READ           = *' }
+    - { regexp: '^ALLOW_WRITE', line: 'ALLOW_WRITE              = */*' }
+    - { regexp: '^ALLOW_ADMINISTRATOR', line: 'ALLOW_ADMINISTRATOR        = *' }
+    - { regexp: '^ALLOW_CONFIG', line: 'ALLOW_CONFIG            = *' }
+    - { regexp: '^ALLOW_NEGOTIATOR', line: 'ALLOW_NEGOTIATOR   = *' }
+    - { regexp: '^ALLOW_DAEMON', line: 'ALLOW_DAEMON               = *' }
+
+
   notify:
+
     - restart condor
